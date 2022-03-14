@@ -13,6 +13,8 @@ int main()
     char rw;
     FILE *file;
     int error;
+    sem_init(&mutex, 0, 1);
+    sem_init(&wrt, 1, 1);
 
     //open inputfile
     file = fopen("scenarios.txt", "r");
@@ -35,6 +37,7 @@ int main()
 
                 //if read create a thread to run the readThread
                 error = pthread_create(&thread, NULL, (void *)readThread, (void *)&lock);
+                printf("Create reader\n");
                 if (error != 0)
                 {
                     printf("Can't create thread.\n");
@@ -47,6 +50,7 @@ int main()
 
                 //if write create a thread to run the writeThread
                 error = pthread_create(&thread, NULL, (void *)writeThread, (void *)&lock);
+                printf("Create writer\n");
                 if (error != 0)
                 {
                     printf("Can't create thread.\n");
