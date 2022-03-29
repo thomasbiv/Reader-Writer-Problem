@@ -26,6 +26,7 @@ int main()
     int read_count = 0;
     int write_count = 0;
     int iter = 0;
+    rwlock_init(&lock);
 
     //open inputfile
     file = fopen("scenarios.txt", "r");
@@ -39,12 +40,12 @@ int main()
         {
 
             scen_count++;
-            while(buff[iter] != '\n')
+            while(buff[iter] != EOF)
             {
                 if (buff[iter] == 'r')
                 {
                     //if read create a thread to run the readThread
-                    error = pthread_create(&rThreads[read_count], NULL, (void *)readThread, NULL);
+                    error = pthread_create(&rThreads[read_count], NULL, (void *)readThread, (void *)&lock);
                     printf("Create reader\n");
                     read_count++;
                     if (error != 0)
@@ -57,7 +58,7 @@ int main()
                 else if (buff[iter] == 'w')
                 {
                     //if write create a thread to run the writeThread
-                    error = pthread_create(&wThreads[write_count], NULL, (void *)writeThread, NULL);
+                    error = pthread_create(&wThreads[write_count], NULL, (void *)writeThread, (void *)&lock);
                     printf("Create writer\n");
                     write_count++;
                     if (error != 0)
@@ -117,14 +118,13 @@ void* writeThread (void* arg){
     reading_writing();
     printf("Finished writing.\n");
     
-    wait_writelock(&lock);
+    post_writelock(&lock); //
 
     return NULL;
 }
 
 //"Reading" and "Writing" time waster
 void reading_writing(){     
-    printf("Test\n");
     int x = 0, i, j, T;
     T = rand() % 10000;
     for(i = 0; i < T; i++){

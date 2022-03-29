@@ -30,6 +30,7 @@ void wait_readlock(rwlock_t *lock) {
     }
     sem_post(&lock->mutex2);
     sem_post(&lock->mutex);
+
 }
 
 //Release readlock
